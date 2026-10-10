@@ -5,19 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CVSE - Result Portal</title>
   <style>
-    body, html { margin:0; padding:0; height:100%; overflow:hidden; }
-    iframe { width:100%; height:100%; border:none; }
+    body, html { margin:0; padding:0; height:100%; overflow:hidden; background:#f5f5f5; }
+    iframe { width:100%; height:100%; border:none; display:block; }
   </style>
 </head>
 <body>
-  <iframe id="appFrame" allow="fullscreen"></iframe>
+  <iframe id="appFrame" allow="fullscreen; top-navigation-by-user-activation"></iframe>
 <script>
   var EXEC = "https://script.google.com/macros/s/AKfycby-Lnrgwsh-tPT4ul6VsxN7MQ7-f5brMHXOwKsvg3KHksvKaKxUN06UFefBl_QYWway/exec";
-  var params = window.location.search;
-  if(!params || params.indexOf('page=') === -1){
-    params = "?page=Login";
+  
+  function getPageParam(){
+    var params = window.location.search;
+    if(!params || params.indexOf('page=') === -1){
+      return "?page=Login";
+    }
+    return params;
   }
-  document.getElementById('appFrame').src = EXEC + params + "&t=" + Date.now();
+
+  function loadApp(){
+    var params = getPageParam();
+    // Add cache buster correctly
+    var sep = params.indexOf('?') > -1 ? '&' : '?';
+    // Remove old t param if exists
+    params = params.replace(/&t=\d+/g,'').replace(/\?t=\d+&?/g,'?');
+    if(params === '?') params = '?page=Login';
+    document.getElementById('appFrame').src = EXEC + params + sep + "t=" + Date.now();
+  }
+
+  // FIX: Listen for navigation from inside Apps Script (Register -> Admin etc)
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.page){
+      var newUrl = window.location.origin + "/?page=" + e.data.page;
+      window.history.pushState({}, "", newUrl);
+      loadApp();
+    }
+    if(e.data && e.data.action === 'navigate' && e.data.page){
+      var newUrl2 = window.location.origin + "/?page=" + e.data.page;
+      window.history.pushState({}, "", newUrl2);
+      loadApp();
+    }
+  });
+
+  loadApp();
 </script>
 </body>
 </html>
