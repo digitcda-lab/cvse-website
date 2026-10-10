@@ -10,6 +10,12 @@
   </style>
 </head>
 <body>
-  <iframe src="https://script.google.com/macros/s/AKfycby-Lnrgwsh-tPT4ul6VsxN7MQ7-f5brMHXOwKsvg3KHksvKaKxUN06UFefBl_QYWway/exec"></iframe>
+  <iframe id="appFrame"></iframe>
+<script>
+  var EXEC = "https://script.google.com/macros/s/AKfycby-Lnrgwsh-tPT4ul6VsxN7MQ7-f5brMHXOwKsvg3KHksvKaKxUN06UFefBl_QYWway/exec";
+  // read ?page= from cvse.in url and pass to GAS iframe
+  var params = window.location.search || "?page=Login";
+  document.getElementById('appFrame').src = EXEC + params;
+</script>
 </body>
 </html>
